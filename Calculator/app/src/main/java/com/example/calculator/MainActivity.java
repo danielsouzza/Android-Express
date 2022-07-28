@@ -13,12 +13,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Views
+    // Attributes
     private TextView viewCalc;
     private TextView enterView;
     private Calculator calculator;
-    private Verify verify;
-    private Reg reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Classes
         calculator = new Calculator();
-        verify = new Verify();
-        reg = new Reg();
 
         // Views
         viewCalc = findViewById(R.id.view_calc);
@@ -58,8 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Start Setting
         viewCalc.setText("0");
-        changeTextSize(25f,40f,getResources().getColor(R.color.calcView),getResources().getColor(R.color.black));
-
+        changeTextSize(25f, 40f, getResources().getColor(R.color.calcView), getResources().getColor(R.color.black));
 
 
         // Logical Part
@@ -138,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         zero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(calculator.getExpression().equals("")){
+                if (calculator.getExpression().equals("")) {
                     return;
                 }
                 inputView("0");
@@ -180,10 +175,10 @@ public class MainActivity extends AppCompatActivity {
         colt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(calculator.getExpression().equals("")){
+                if (calculator.getExpression().equals("")) {
                     inputView("0.");
                     calculationView();
-                }else{
+                } else {
                     inputView(".");
                 }
 
@@ -195,91 +190,102 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String result = calculationView();
-                if(verify.isNumeric(result)){
+                if (Verify.isNumeric(result)) {
                     calculator.setCalc(result);
                     calculator.setExpression(result);
-                }else {
+                } else {
                     calculator.setCalc("");
                     calculator.setExpression("");
                 }
 
                 viewCalc.setTextColor(getResources().getColor(R.color.black));
-                changeTextSize(25f,40f,getResources().getColor(R.color.calcView),getResources().getColor(R.color.black));
+                changeTextSize(25f, 40f, getResources().getColor(R.color.calcView), getResources().getColor(R.color.black));
             }
         });
 
         clearAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeTextSize(25f,40f,getResources().getColor(R.color.calcView),getResources().getColor(R.color.black));
-                enterView.setText("");
-                viewCalc.setText("0");
-                calculator.setCalc("");
-                calculator.setExpression("");
+                clearEnterView("AC");
             }
         });
 
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clearEnterView();
+                clearEnterView("clear");
             }
         });
     }
 
-    public void changeTextSize(float enterSize, float calcSize, int enterColo, int calcColor){
-        enterView.setTextSize(TypedValue.COMPLEX_UNIT_SP,enterSize);
+    // Change the size of and with the text
+    public void changeTextSize(float enterSize, float calcSize, int enterColo, int calcColor) {
+        enterView.setTextSize(TypedValue.COMPLEX_UNIT_SP, enterSize);
         enterView.setTextColor(enterColo);
-        viewCalc.setTextSize(TypedValue.COMPLEX_UNIT_SP,calcSize );
+        viewCalc.setTextSize(TypedValue.COMPLEX_UNIT_SP, calcSize);
         viewCalc.setTextColor(calcColor);
     }
 
+    // Send information to (Enter View)
     @SuppressLint("SetTextI18n")
     public void inputView(String input) {
-        changeTextSize(40f,25f,getResources().getColor(R.color.black),getResources().getColor(R.color.calcView));
-        String expression = calculator.getExpression().replace(" ","");
-        if(expression.equals(""))
-            if(Verify.checkOperators(input, reg.regexLastOper())||enterView.getText().toString().equals("Can't divide by zero")){
-                expression = "0";
-                viewCalc.setText("0");
-            }
-        if(!calculator.getCalc().equals("")){
-            calculator.setCalc("");
-            if(verify.isNumeric(input)) expression = "";
-        }
-
-        if (Verify.checkOperators(input, reg.regexLastOper()))
-            if (!verify.getFoundPart(expression, reg.regexLastOper()).equals("")) {
-                expression = expression.substring(0, expression.length() - 1);
-            }
+        changeTextSize(40f, 25f, getResources().getColor(R.color.black), getResources().getColor(R.color.calcView));
+        String expression = calculator.getExpression().replace(" ", "");
+        expression = checkToView(expression, input);
         enterView.setText(expression + input);
         calculator.setExpression(expression + input);
     }
 
+    // Send information to (Calculation View)
+    @SuppressLint("SetTextI18n")
     public String calculationView() {
         String result = "";
-        if(!calculator.getExpression().equals("")){
-            result = calculator.calculateExpression();
-            viewCalc.setText("="+result);
-            return result;
+        try {
+            if (!calculator.getExpression().equals("")) {
+                result = calculator.calculateExpression();
+                viewCalc.setText("=" + result);
+                return result;
+            }
+        } catch (Exception e) {
+            result = e.getMessage();
         }
-    return result;
+        return result;
     }
 
-    public void clearEnterView(){
+    // Clear views
+    public void clearEnterView(String typeClear) {
         String exp = calculator.getExpression();
-        if(!calculator.getCalc().equals("")){
+        if (!calculator.getCalc().equals("") && !typeClear.equals("AC")) {
             return;
-        }else if(exp.length() <= 1){
-            changeTextSize(25f,40f,getResources().getColor(R.color.calcView),getResources().getColor(R.color.black));
+        } else if (exp.length() <= 1 || typeClear.equals("AC")) {
+            changeTextSize(25f, 40f, getResources().getColor(R.color.calcView), getResources().getColor(R.color.black));
             enterView.setText("");
             viewCalc.setText("0");
             calculator.setExpression("");
             calculator.setCalc("");
             return;
         }
-        calculator.setExpression(exp.substring(0,exp.length()-1));
+        calculator.setExpression(exp.substring(0, exp.length() - 1));
         enterView.setText(calculator.getExpression());
         calculationView();
+    }
+
+    // Do some checks before sending to the (Enter View)
+    private String checkToView(String expression, String input) {
+        if (expression.equals(""))
+            if (Verify.checkOperators(input, Reg.regexLastOper()) || enterView.getText().toString().equals("Can't divide by zero")) {
+                expression = "0";
+                viewCalc.setText("0");
+            }
+        if (!calculator.getCalc().equals("")) {
+            calculator.setCalc("");
+            if (Verify.isNumeric(input)) expression = "";
+        }
+
+        if (Verify.checkOperators(input, Reg.regexLastOper()))
+            if (!Verify.getFoundPart(expression, Reg.regexLastOper()).equals("")) {
+                expression = expression.substring(0, expression.length() - 1);
+            }
+        return expression;
     }
 }

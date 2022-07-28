@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Verify {
-    public String getFoundPart(String input, String OPERATOR_REGEX ){
+    public static String getFoundPart(String input, String OPERATOR_REGEX ){
         String result = "";
         Pattern pattern = Pattern.compile(OPERATOR_REGEX);
         Matcher matcher = pattern.matcher(input);
@@ -18,7 +18,7 @@ public class Verify {
         return result;
     }
 
-    public boolean isNumeric(String expression){
+    public static boolean isNumeric(String expression){
         try {
             Double.parseDouble(expression);
             return true;
@@ -27,7 +27,7 @@ public class Verify {
         }
     }
 
-    public boolean checkIntOrDouble(String exp){
+    public static boolean checkIntOrDouble(String exp){
         double result = Double.parseDouble(exp);
         return (int) result == result;
     }
@@ -36,4 +36,5 @@ public class Verify {
         Pattern pattern = Pattern.compile(OPERATOR_REGEX);
         return pattern.matcher(input).matches();
     }
+
 }
