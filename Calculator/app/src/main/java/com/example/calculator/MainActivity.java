@@ -18,6 +18,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView enterView;
     private Calculator calculator;
 
+    // Iterator
+    int parentheses;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
         Button multiply = findViewById(R.id.button_multiply);
         Button divide = findViewById(R.id.button_divide);
         Button iqual = findViewById(R.id.button_igual);
+        Button rightP = findViewById(R.id.button_rigthParentheses);
+        Button leftP = findViewById(R.id.button_leftParentheses);
 
         // Start Setting
+        // Iterator
+        parentheses = 0;
         viewCalc.setText("0");
         changeTextSize(25f, 40f, getResources().getColor(R.color.calcView), getResources().getColor(R.color.black));
 
@@ -138,6 +145,27 @@ public class MainActivity extends AppCompatActivity {
                 }
                 inputView("0");
                 calculationView();
+            }
+        });
+
+        rightP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parentheses++;
+                inputView("(");
+                calculationView();
+            }
+        });
+
+        leftP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(parentheses > 0) {
+                    inputView(")");
+                    calculationView();
+                    parentheses --;
+                }
+
             }
         });
 
@@ -241,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
     public String calculationView() {
         String result = "";
         try {
-            if (!calculator.getExpression().equals("")) {
-                result = calculator.calculateExpression();
+            if (!calculator.getExpression().equals("") && !(parentheses > 0)) {
+                result = calculator.calculateExpression(calculator.getExpression());
                 viewCalc.setText("=" + result);
                 return result;
             }
@@ -263,11 +291,18 @@ public class MainActivity extends AppCompatActivity {
             viewCalc.setText("0");
             calculator.setExpression("");
             calculator.setCalc("");
+            parentheses = 0;
             return;
+        }else{
+            if(exp.charAt(exp.length()-1) == ')') {
+                parentheses++;
+            } else if(exp.charAt(exp.length()-1) == '('){
+                parentheses--;
+            }
+            calculator.setExpression(exp.substring(0, exp.length() - 1));
+            enterView.setText(calculator.getExpression());
+            calculationView();
         }
-        calculator.setExpression(exp.substring(0, exp.length() - 1));
-        enterView.setText(calculator.getExpression());
-        calculationView();
     }
 
     // Do some checks before sending to the (Enter View)
@@ -285,6 +320,11 @@ public class MainActivity extends AppCompatActivity {
         if (Verify.checkOperators(input, Reg.regexLastOper()))
             if (!Verify.getFoundPart(expression, Reg.regexLastOper()).equals("")) {
                 expression = expression.substring(0, expression.length() - 1);
+            }
+        if(!expression.equals(""))
+            if(Character.isDigit(expression.charAt(expression.length()-1)) && input.equals("(")){
+                expression = expression + "×";
+
             }
         return expression;
     }

@@ -11,4 +11,5 @@
     <color name="numbers">#000</color>
     <color name="operators">#304ffe</color>
     <color name="calcView">#62727b</color>
+    <color name="gray">#e0e0e0</color>
 </resources>

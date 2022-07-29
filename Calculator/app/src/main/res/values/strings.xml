@@ -20,5 +20,7 @@
     <string name="eight">8</string>
     <string name="nine">9</string>
     <string name="zero">0</string>
+    <string name="right_parentheses">(</string>
+    <string name="left_parentheses">)</string>
     
 </resources>

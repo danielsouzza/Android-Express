@@ -13,16 +13,20 @@ public class Calculator {
     }
 
 
-    public String calculateExpression(){
+    public String calculateExpression(String expression){
         try {
-            String expression = this.getExpression().replace(" ","");
+            expression = expression.replace(" ","");
             if(!Verify.getFoundPart(expression, Reg.regexLastOper()).equals(""))
                 expression = expression.substring(0, expression.length() - 1);
 
             // check if it's numeric
             while(!(Verify.isNumeric(expression))){ // checks if it found the priority 1 regex pattern
+                if(!Verify.getFoundPart(expression, Reg.regex0()).equals("")) {
+                    String priority = Verify.getFoundPart(expression, Reg.regex0());
+                    String recur = calculateExpression(priority.replace("(", "").replace(")", ""));
+                    expression = expression.replace(priority, recur);
 
-                if(!Verify.getFoundPart(expression, Reg.regex1()).equals("")){
+                }else if(!Verify.getFoundPart(expression, Reg.regex1()).equals("")){
 
                     expression = calcPartOfTheExpression(expression, Reg.regex1()).replace(",","."); // Takes and calculates the part found
 
@@ -86,7 +90,7 @@ public class Calculator {
             result = String.format("%f", (num1 + num2));
         }else if(part_2.charAt(0) == '-'){
             num1 = Double.parseDouble(part_1);
-            part_2 = part_2.replace("-",""); // Remove operator from string to perform calculation
+            part_2 = part_2.replaceFirst("-",""); // Remove operator from string to perform calculation
             num2 = Double.parseDouble(part_2);
             result = String.format("%f", (num1 - num2)); // Put the result in (result)
         }
