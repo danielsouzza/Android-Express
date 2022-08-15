@@ -161,9 +161,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(parentheses > 0) {
+                    parentheses --;
                     inputView(")");
                     calculationView();
-                    parentheses --;
                 }
 
             }
@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
     public String calculationView() {
         String result = "";
         try {
-            if (!calculator.getExpression().equals("") && !(parentheses > 0)) {
+            if (!calculator.getExpression().equals("") && parentheses == 0) {
                 result = calculator.calculateExpression(calculator.getExpression());
                 viewCalc.setText("=" + result);
                 return result;
@@ -322,9 +322,11 @@ public class MainActivity extends AppCompatActivity {
                 expression = expression.substring(0, expression.length() - 1);
             }
         if(!expression.equals(""))
-            if(Character.isDigit(expression.charAt(expression.length()-1)) && input.equals("(")){
+            if((Character.isDigit(expression.charAt(expression.length()-1)) || expression.charAt(expression.length()-1) == ')') && input.equals("(")){
                 expression = expression + "×";
 
+            }else if(expression.charAt(expression.length()-1) == ')' && Character.isDigit(input.charAt(0))){
+                expression = expression + "×";
             }
         return expression;
     }
